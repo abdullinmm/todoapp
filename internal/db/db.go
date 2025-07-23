@@ -2,10 +2,14 @@ package db
 
 import (
 	"database/sql"
+
+	_ "github.com/lib/pq"
+
 	"fmt"
 )
 
-func initDB() (*sql.DB, error) {
+// InitDB initializes the database connection and returns a pointer to the database object.
+func InitDB() (*sql.DB, error) {
 	dsn := "host=localhost port=5432 user=todo password=secret dbname=todoapp sslmode=disable"
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
