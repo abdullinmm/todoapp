@@ -1,13 +1,17 @@
 package main
 
-import "github.com/yourname/todoapp/internal/db"
+import (
+	"log"
+
+	"github.com/yourname/todoapp/internal/db"
+)
 
 func main() {
-	db, err := db.InitDB()
+	database, err := db.InitDB()
 	if err != nil {
-		panic(err)
+		log.Fatalf("Brush error to the database: %v", err)
 	}
-	defer db.Close()
+	defer database.Close()
 
 	// Your code here
 }
