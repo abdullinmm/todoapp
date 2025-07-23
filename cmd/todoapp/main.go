@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/yourname/todoapp/internal/db"
+	"github.com/abdullinmm/todoapp/internal/db"
 )
 
 func main() {
