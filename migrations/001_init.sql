@@ -1,7 +1,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
-    password_hasu TEXT NOT NULL
+    password_hash TEXT NOT NULL
 );
 
 CREATE TABLE tasks (
