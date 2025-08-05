@@ -2,8 +2,8 @@ package handlers
 
 import "errors"
 
-// ValidateJSON validates the JSON request body for the register endpoint.
-func ValidateJSON(reg *RegisterRequest) error {
+// ValidateRegister validates the JSON request body for the register endpoint.
+func ValidateRegister(reg *RegisterRequest) error {
 	if reg.Username == "" {
 		return errors.New("username is required")
 	}

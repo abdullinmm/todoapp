@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+
+	"github.com/abdullinmm/todoapp/internal/auth"
+	"github.com/abdullinmm/todoapp/internal/db"
 )
 
 // RegisterHandler handles registration requests.
@@ -21,13 +24,13 @@ func RegisterHandler(database *sql.DB) http.HandlerFunc {
 		}
 		log.Printf("→ получен JSON: username=%q password=%q", reg.Username, reg.Password)
 
-		err = ValidateJSON(reg)
+		err = ValidateRegister(reg)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		hashedPassword, err := HashPassword(reg.Password)
+		hashedPassword, err := auth.HashPassword(reg.Password)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -35,11 +38,7 @@ func RegisterHandler(database *sql.DB) http.HandlerFunc {
 		log.Printf("→ пароль захеширован: %s", hashedPassword[:10]) // первые 10 символов
 
 		log.Println("→ пытаемся вставить пользователя в БД")
-		err = SaveUserToDB(database, reg.Username, hashedPassword)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		_, err = db.CreateUser(database, reg.Username, hashedPassword)
 		if err != nil {
 			log.Printf("❌ ошибка при вставке: %v", err) // выброси ошибку прямо в лог
 			http.Error(w, "DB insert error", 500)
