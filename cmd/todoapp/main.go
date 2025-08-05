@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/abdullinmm/todoapp/internal/db"
+	"github.com/abdullinmm/todoapp/internal/handlers"
 )
 
 func main() {
@@ -14,18 +15,11 @@ func main() {
 	}
 	defer database.Close()
 
-	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Register handler"))
-	})
-
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Login handler"))
-	})
+	http.HandleFunc("/register", handlers.RegisterHandler(database))
+	http.HandleFunc("/login", handlers.LoginHandler(database))
 
 	log.Println("Server started on : 8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
-
-	// Your code here
 }
