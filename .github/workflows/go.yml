@@ -73,8 +73,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t your-dockerhub-username/todoapp:${{ github.sha }} .
+          docker build -t your-dockerhub-abdullinmm/todoapp:${{ github.sha }} .
 
       - name: Push Docker image
         run: |
-          docker push your-dockerhub-username/todoapp:${{ github.sha }}
+          docker push your-dockerhub-abdullinmm/todoapp:${{ github.sha }}
