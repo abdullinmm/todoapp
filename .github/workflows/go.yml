@@ -1,29 +1,80 @@
-name: Go CI
+name: Go CI with Build and Docker
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, master]
   pull_request:
-    branches: [main, develop]
+    branches: [main, master]
 
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: todo
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: todoapp
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U todo"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgres://todo:secret@localhost:5432/todoapp?sslmode=disable
+      JWT_SECRET: supersecretkey123
+      PORT: 8080
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version: "1.22"
 
-      - name: Build
-        run: go build -v ./...
+      - name: Download dependencies
+        run: go mod download
 
-      - name: Run tests
-        run: go test -v -race -cover ./...
-
-      - name: Run golint
+      - name: Wait for Postgres to be ready
         run: |
-          go install golang.org/x/lint/golint@latest
-          golint ./....
+          for i in {1..10}; do
+            pg_isready -U todo -h localhost && break
+            sleep 2
+          done
+
+      - name: Apply migrations
+        run: |
+          for f in migrations/*.sql; do
+            echo "Applying $f"
+            PGPASSWORD=secret psql -h localhost -U todo -d todoapp -f "$f"
+          done
+
+      - name: Build application binary
+        run: go build -v -o bin/todoapp ./cmd/todoapp
+
+      - name: Run tests and generate coverage
+        run: go test -v -coverprofile=coverage.out ./...
+
+      - name: Show test coverage
+        run: go tool cover -func=coverage.out
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t your-dockerhub-username/todoapp:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: |
+          docker push your-dockerhub-username/todoapp:${{ github.sha }}

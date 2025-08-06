@@ -4,12 +4,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/abdullinmm/todoapp/internal/config"
 	"github.com/abdullinmm/todoapp/internal/db"
 	"github.com/abdullinmm/todoapp/internal/handlers"
 )
 
 func main() {
-	database, err := db.InitDB()
+	cfg := config.LoadConfig()
+	database, err := db.InitDB(cfg.DarabaseURl)
 	if err != nil {
 		log.Fatalf("Brush error to the database: %v", err)
 	}
@@ -18,8 +20,8 @@ func main() {
 	http.HandleFunc("/register", handlers.RegisterHandler(database))
 	http.HandleFunc("/login", handlers.LoginHandler(database))
 
-	log.Println("Server started on : 8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Printf("Server started on : %s", cfg.Port)
+	if err := http.ListenAndServe(":"+cfg.Port, nil); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
