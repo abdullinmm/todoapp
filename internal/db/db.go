@@ -9,9 +9,10 @@ import (
 )
 
 // InitDB initializes the database connection and returns a pointer to the database object.
-func InitDB() (*sql.DB, error) {
-	dsn := "host=localhost port=5432 user=todo password=secret dbname=todoapp sslmode=disable"
-	db, err := sql.Open("postgres", dsn)
+func InitDB(DatabaseURL string) (*sql.DB, error) {
+	//dsn := "host=localhost port=5432 user=todo password=secret dbname=todoapp sslmode=disable"
+	//dsn = fmt.Sprintf("%s", dsn)
+	db, err := sql.Open("postgres", DatabaseURL)
 	if err != nil {
 		return nil, err
 	}
