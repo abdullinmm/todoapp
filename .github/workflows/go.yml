@@ -2,9 +2,9 @@ name: Go CI with Build and Docker
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, develop]
   pull_request:
-    branches: [main, master]
+    branches: [main, develop]
 
 jobs:
   build_and_test:
@@ -37,7 +37,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
+          go-version: "1.24.2"
 
       - name: Download dependencies
         run: go mod download
