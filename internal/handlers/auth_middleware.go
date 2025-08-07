@@ -24,6 +24,7 @@ func AuthMiddleware(secret string, next http.Handler) http.Handler {
 		userID, err := auth.ParseJWT(token, secret)
 		if err != nil {
 			http.Error(w, "invalid token", http.StatusUnauthorized)
+			return
 		}
 		ctx := context.WithValue(r.Context(), userIDKey, userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
