@@ -19,6 +19,7 @@ func RegisterHandler(database *sql.DB) http.HandlerFunc {
 		log.Println("→ registerHandler вызван")
 		reg, err := ParseRegisterRequest(r)
 		if err != nil {
+			writeJSONError(w, http.StatusBadRequest, "", err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -26,12 +27,14 @@ func RegisterHandler(database *sql.DB) http.HandlerFunc {
 
 		err = ValidateRegister(reg)
 		if err != nil {
+			writeJSONError(w, http.StatusBadRequest, "", err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		hashedPassword, err := auth.HashPassword(reg.Password)
 		if err != nil {
+			writeJSONError(w, http.StatusInternalServerError, "", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
