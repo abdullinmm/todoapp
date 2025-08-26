@@ -17,13 +17,15 @@ func AuthMiddleware(secret string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			http.Error(w, "no token", http.StatusUnauthorized)
+			writeJSONError(w, http.StatusUnauthorized, "no token", "no token")
+			// http.Error(w, "no token", http.StatusUnauthorized)
 			return
 		}
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		userID, err := auth.ParseJWT(token, secret)
 		if err != nil {
-			http.Error(w, "invalid token", http.StatusUnauthorized)
+			writeJSONError(w, http.StatusUnauthorized, err.Error(), "invalid token")
+			// http.Error(w, "invalid token", http.StatusUnauthorized)
 			return
 		}
 		ctx := context.WithValue(r.Context(), userIDKey, userID)

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 )
 
@@ -11,10 +11,12 @@ func MeHandler(w http.ResponseWriter, r *http.Request) {
 	userID := GetUserID(r)
 
 	if userID == 0 {
-		http.Error(w, "User not found in context", http.StatusUnauthorized)
+		writeJSONError(w, http.StatusUnauthorized, "User not found in context", "")
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(fmt.Sprintf(`{"user_id": %d}`, userID)))
+	_ = json.NewEncoder(w).Encode(map[string]int{
+		"user_id": userID,
+	})
 }
