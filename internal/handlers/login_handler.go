@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -64,7 +63,7 @@ func LoginHandler(cfg *config.Config, database *sql.DB) http.HandlerFunc {
 			"token": token,
 		})
 
-		fmt.Printf("w, %v", w)
+		// fmt.Printf("w, %v", w)
 	}
 
 }

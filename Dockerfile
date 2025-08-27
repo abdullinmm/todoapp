@@ -12,24 +12,33 @@ RUN go mod download
 COPY . .
 
 # Collect binary (Main Package - Way ./cmd/todoApp, correct if the structure is different)
-RUN CGO_ENABLED=0 GOOS=linux go build -o todoapp ./cmd/todoapp
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -trimpath \
+    -ldflags "-s -w" \
+    -o todoapp ./cmd/todoapp
 
 # --- Stage 2: The final minimum image ---
 FROM alpine:latest
 
+# Add CA-Certificates for HTTPS queries
+RUN apk --no-cache add ca-certificates
+
 WORKDIR /app
 
-# Copy binary from Builder Stage
+# Create Non-Rot user
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
+# Copy Binar from Builder Stage
 COPY --from=builder /build/todoapp .
 
-# Optional: Copy Migrations if you need to migrate the base in the container
-# COPY --from=builder /build/migrations ./migrations
+# Change the owner
+RUN chown appuser:appgroup todoapp
 
-# Example of a variable environment
+# Switch to Non-ROOT user
+USER appuser
+
 ENV PORT=8080
-
-# Open the port (optional, for documentation)
 EXPOSE 8080
 
-# Start the application
 CMD ["./todoapp"]
