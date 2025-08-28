@@ -4,7 +4,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Hashpassword drives a password using BCRYPT.
+// HashPassword drives a password using BCRYPT.
 // Entrance: raw password.
 // Exit: line-hesh and error.
 func HashPassword(raw string) (string, error) {
@@ -17,7 +17,7 @@ func HashPassword(raw string) (string, error) {
 	return string(hash), nil
 }
 
-// Checkpasswordhash compares a raw password with hash.
+// CheckPasswordHash compares a raw password with hash.
 // Returns True if the password is suitable, otherwise false.
 func CheckPasswordHash(hashedPassword string, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
