@@ -16,15 +16,30 @@ const userIDKey = contextKey("userID")
 func AuthMiddleware(secret string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
+
+		// Check the availability of the header
+		if authHeader == "" {
+			writeJSONError(w, http.StatusUnauthorized, "missing_token", "Authorization header required")
+			return
+		}
+
+		// Strict checking scheme
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			http.Error(w, "no token", http.StatusUnauthorized)
+			writeJSONError(w, http.StatusUnauthorized, "invalid_auth_header", "Authorization header must start with 'Bearer '")
 			return
 		}
 		token := strings.TrimPrefix(authHeader, "Bearer ")
+		if token == "" {
+			writeJSONError(w, http.StatusUnauthorized, "empty_token", "Token cannot be empty")
+			return
+		}
+
 		userID, err := auth.ParseJWT(token, secret)
 		if err != nil {
-			http.Error(w, "invalid token", http.StatusUnauthorized)
+			writeJSONError(w, http.StatusUnauthorized, "invalid_token", err.Error())
+			return
 		}
+
 		ctx := context.WithValue(r.Context(), userIDKey, userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

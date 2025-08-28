@@ -11,10 +11,13 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
-	log.Printf("jwt secret: %q", cfg.JWTSecret)
-	database, err := db.InitDB(cfg.DarabaseURl)
+
+	// Do not log in the secret in Production!
+	// log.Printf("jwt secret: %q", cfg.JWTSecret)
+
+	database, err := db.InitDB(cfg.DatabaseURl)
 	if err != nil {
-		log.Fatalf("Brush error to the database: %v", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	defer database.Close()
 
