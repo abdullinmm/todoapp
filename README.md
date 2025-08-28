@@ -195,28 +195,6 @@ curl http://localhost:8080/me
 ```
 go test ./… -v
 ```
-
-Рекомендуется покрыть:
-- `internal/auth`: `HashPassword`/`CheckPasswordHash`, `GenerateJWT`/`ParseJWT`
-- `internal/handlers`: `AuthMiddleware` (валидный/битый/просроченный токен), `MeHandler`
-- `internal/db`: через моки
-
-## CI/CD (опционально)
-
-- Секреты: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` (Write)
-- Пример шагов:
-	1. `go vet`
-	2. `golangci-lint run`
-	3. `go test`
-	4. `docker build` + `docker push`
-
-## Траблшутинг
-
-- **invalid token** → проверьте алгоритм HS256 и значение `JWT_SECRET`.
-- **ECDSA expects *ecdsa.PrivateKey** → не используйте ES256 со строковым секретом.
-- **go mod requires go ≥ 1.24** → обновите образ в `Dockerfile` до `golang:1.24-alpine`.
-- **docker push denied** → убедитесь, что `DOCKERHUB_USERNAME` и `DOCKERHUB_TOKEN` заданы правильно.
-
 ## Лицензия
 
 MIT © Marsel Abdullin
