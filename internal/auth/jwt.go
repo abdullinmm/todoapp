@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// GenerateJWT generates a JWT token for the given user ID and secret.
 func GenerateJWT(userID int, secret string) (string, error) {
 	if secret == "" {
 		return "", errors.New("JWT secret cannot be empty")
